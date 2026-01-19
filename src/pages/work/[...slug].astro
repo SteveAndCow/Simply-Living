@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectLayout from '@layouts/ProjectLayout.astro';
+
+// Generate static paths for all projects
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await project.render();
+
+const {
+  title,
+  client,
+  date,
+  description,
+  heroVideo,
+  gallery,
+  credits,
+  externalVideoUrl,
+  category,
+} = project.data;
+---
+
+<ProjectLayout
+  title={title}
+  client={client}
+  date={date}
+  description={description}
+  heroVideo={heroVideo}
+  gallery={gallery}
+  credits={credits}
+  externalVideoUrl={externalVideoUrl}
+  category={category}
+>
+  <Content />
+</ProjectLayout>

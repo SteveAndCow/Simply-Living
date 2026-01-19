@@ -1,0 +1,77 @@
+/* Design Tokens */
+:root {
+  /* Colors */
+  --color-bg: #000000;
+  --color-text: #FFFFFF;
+  --color-text-secondary: #888888;
+  --color-text-muted: #666666;
+  --color-accent: #FFFFFF;
+
+  /* Typography */
+  --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-title: clamp(2rem, 5vw, 3.5rem);
+  --text-hero: clamp(3.5rem, 10vw, 7.5rem);
+
+  /* Spacing */
+  --space-xs: 0.5rem;      /* 8px */
+  --space-sm: 1rem;        /* 16px */
+  --space-md: 1.5rem;      /* 24px */
+  --space-lg: 2rem;        /* 32px */
+  --space-xl: 3rem;        /* 48px */
+  --space-2xl: 4rem;       /* 64px */
+  --space-3xl: 6rem;       /* 96px */
+
+  /* Layout */
+  --max-width: 1440px;
+  --padding-mobile: 2rem;
+  --padding-tablet: 2.5rem;
+  --padding-desktop: 4rem;
+
+  /* Transitions */
+  --transition-speed: 0.7s;
+  --transition-fast: 0.3s;
+  --transition-medium: 0.5s;
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* Z-Index Layers */
+  --z-background: 0;
+  --z-content: 10;
+  --z-overlay: 100;
+  --z-header: 1000;
+  --z-modal: 10000;
+
+  /* Effects */
+  --backdrop-blur: 40px;
+  --grain-opacity: 0.03;
+}
+
+/* Responsive Padding */
+@media (max-width: 768px) {
+  :root {
+    --padding: var(--padding-mobile);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --padding: var(--padding-tablet);
+  }
+}
+
+@media (min-width: 1025px) {
+  :root {
+    --padding: var(--padding-desktop);
+  }
+}

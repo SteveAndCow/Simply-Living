@@ -1,0 +1,335 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Contact"
+  description="Get in touch with Simply Living Studios for your next project."
+>
+  <div class="contact-page">
+    <section class="contact-section">
+      <div class="container">
+        <div class="contact-grid">
+          <!-- Contact Form -->
+          <div class="form-container">
+            <h1 class="page-title">Let's talk</h1>
+            <p class="page-intro">
+              Have a project in mind? We'd love to hear about it. Fill out the form and we'll get
+              back to you within 24 hours.
+            </p>
+
+            <form class="contact-form" id="contact-form">
+              <div class="form-group">
+                <label for="name" class="form-label">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="form-input"
+                  required
+                  autocomplete="name"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="form-input"
+                  required
+                  autocomplete="email"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="project-type" class="form-label">Project Type</label>
+                <select id="project-type" name="project-type" class="form-select" required>
+                  <option value="">Select a type</option>
+                  <option value="music-video">Music Video</option>
+                  <option value="brand-content">Brand Content</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="message" class="form-label">Message</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  class="form-textarea"
+                  rows="6"
+                  required></textarea>
+              </div>
+
+              <button type="submit" class="submit-button">Send Inquiry</button>
+
+              <p class="form-status" id="form-status"></p>
+            </form>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="info-container">
+            <div class="info-section">
+              <h2 class="info-title">Or reach us directly</h2>
+
+              <div class="info-items">
+                <div class="info-item">
+                  <h3 class="info-label">Email</h3>
+                  <a href="mailto:hello@simplylivingstudios.com" class="info-link">
+                    hello@simplylivingstudios.com
+                  </a>
+                </div>
+
+                <div class="info-item">
+                  <h3 class="info-label">Instagram</h3>
+                  <a
+                    href="https://instagram.com/simplylivingstudios"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="info-link"
+                  >
+                    @simplylivingstudios
+                  </a>
+                </div>
+
+                <div class="info-item">
+                  <h3 class="info-label">Location</h3>
+                  <p class="info-text">Toronto, ON</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-note">
+              <p>
+                We typically respond within 24 hours. For urgent inquiries, please reach out via
+                email directly.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .contact-page {
+    padding-top: 120px;
+  }
+
+  .contact-section {
+    padding: var(--space-3xl) 0;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--space-3xl);
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    margin-bottom: var(--space-lg);
+  }
+
+  .page-intro {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-2xl);
+  }
+
+  /* Form Styles */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .form-label {
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-secondary);
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100%;
+    padding: var(--space-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-text);
+    transition: border-color var(--transition-fast) var(--ease-smooth);
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--color-text);
+  }
+
+  .form-select {
+    cursor: pointer;
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 150px;
+  }
+
+  .submit-button {
+    width: 100%;
+    padding: var(--space-md) var(--space-xl);
+    font-size: var(--text-base);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background-color: transparent;
+    border: 1px solid var(--color-text);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all var(--transition-fast) var(--ease-smooth);
+  }
+
+  .submit-button:hover {
+    background-color: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .submit-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .form-status {
+    font-size: var(--text-sm);
+    text-align: center;
+    min-height: 1.5em;
+  }
+
+  .form-status.success {
+    color: #4ade80;
+  }
+
+  .form-status.error {
+    color: #ef4444;
+  }
+
+  /* Info Container */
+  .info-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+  }
+
+  .info-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-lg);
+  }
+
+  .info-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .info-label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+  }
+
+  .info-link {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    text-decoration: none;
+    transition: opacity var(--transition-fast) var(--ease-smooth);
+  }
+
+  .info-link:hover {
+    opacity: 0.7;
+  }
+
+  .info-text {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+  }
+
+  .info-note {
+    padding: var(--space-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .contact-page {
+      padding-top: 80px;
+    }
+
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+
+    .info-container {
+      order: 2;
+    }
+  }
+</style>
+
+<script>
+  // Basic form handling (will be enhanced with Svelte in Phase 3)
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const status = document.getElementById('form-status') as HTMLParagraphElement;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submitButton.disabled = true;
+    status.textContent = 'Sending...';
+    status.className = 'form-status';
+
+    // Simulate form submission (replace with actual endpoint later)
+    try {
+      // TODO: Replace with actual form submission endpoint (Formspree, etc.)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      status.textContent = "Message sent! We'll get back to you soon.";
+      status.className = 'form-status success';
+      form.reset();
+    } catch (error) {
+      status.textContent = 'Something went wrong. Please try again.';
+      status.className = 'form-status error';
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+</script>

@@ -1,0 +1,151 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { imageUrl } from '@lib/cloudinary';
+
+// Get all projects sorted by date
+const allProjects = await getCollection('projects');
+const sortedProjects = allProjects.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<BaseLayout title="Work" description="View all projects by Simply Living Studios">
+  <div class="work-page">
+    <section class="page-header">
+      <div class="container">
+        <h1 class="page-title">Work</h1>
+        <p class="page-description">
+          A selection of our recent projects across music videos, brand content, and commercial
+          work.
+        </p>
+      </div>
+    </section>
+
+    <section class="projects-section">
+      <div class="container">
+        <div class="projects-grid">
+          {
+            sortedProjects.map((project) => (
+              <a href={`/work/${project.slug}`} class="project-card">
+                <div class="card-image">
+                  <img
+                    src={imageUrl(project.data.thumbnail, { width: 800, quality: 'auto' })}
+                    alt={project.data.title}
+                    loading="lazy"
+                  />
+                </div>
+                <div class="card-info">
+                  <h2 class="card-title">{project.data.title}</h2>
+                  <p class="card-client">{project.data.client}</p>
+                  <p class="card-category">{project.data.category}</p>
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .work-page {
+    padding-top: 120px;
+  }
+
+  .page-header {
+    padding: var(--space-3xl) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    margin-bottom: var(--space-lg);
+  }
+
+  .page-description {
+    font-size: var(--text-lg);
+    max-width: 700px;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  .projects-section {
+    padding: var(--space-3xl) 0;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--space-2xl);
+  }
+
+  .project-card {
+    text-decoration: none;
+    color: var(--color-text);
+    display: block;
+    transition: transform var(--transition-fast) var(--ease-smooth);
+  }
+
+  .project-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .card-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: #111;
+    margin-bottom: var(--space-md);
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-speed) var(--ease-smooth);
+  }
+
+  .project-card:hover .card-image img {
+    transform: scale(1.05);
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+  }
+
+  .card-client {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .card-category {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .work-page {
+      padding-top: 80px;
+    }
+
+    .projects-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+    }
+  }
+</style>

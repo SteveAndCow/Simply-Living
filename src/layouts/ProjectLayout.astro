@@ -1,0 +1,317 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { videoUrl, videoPoster, imageUrl } from '@lib/cloudinary';
+import { formatDate } from '@lib/utils';
+
+interface Props {
+  title: string;
+  client: string;
+  date: Date;
+  description: string;
+  heroVideo: string;
+  gallery?: string[];
+  credits: { role: string; name: string }[];
+  externalVideoUrl?: string;
+  category: string;
+}
+
+const {
+  title,
+  client,
+  date,
+  description,
+  heroVideo,
+  gallery,
+  credits,
+  externalVideoUrl,
+  category,
+} = Astro.props;
+
+const formattedDate = formatDate(date);
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="project">
+    <!-- Hero Video -->
+    <section class="hero-video">
+      <video
+        class="video"
+        src={videoUrl(heroVideo, { quality: 'auto', format: 'auto' })}
+        poster={videoPoster(heroVideo, { width: 1920 })}
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
+    </section>
+
+    <!-- Project Info -->
+    <section class="project-info">
+      <div class="info-grid">
+        <div class="info-left">
+          <h1 class="project-title">{title}</h1>
+          <p class="project-description">{description}</p>
+        </div>
+        <div class="info-right">
+          <dl class="project-meta">
+            <div class="meta-item">
+              <dt>Client</dt>
+              <dd>{client}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>Date</dt>
+              <dd>{formattedDate}</dd>
+            </div>
+            <div class="meta-item">
+              <dt>Category</dt>
+              <dd>{category}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- Extended Content (from MDX) -->
+    {
+      Astro.slots.has('default') && (
+        <section class="project-content">
+          <div class="content-wrapper">
+            <slot />
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Gallery -->
+    {
+      gallery && gallery.length > 0 && (
+        <section class="gallery">
+          <div class="gallery-grid">
+            {gallery.map((imageId) => (
+              <img
+                src={imageUrl(imageId, { width: 1200, quality: 'auto' })}
+                alt=""
+                loading="lazy"
+                class="gallery-image"
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Credits -->
+    <section class="credits">
+      <div class="credits-wrapper">
+        <h2 class="credits-title">Credits</h2>
+        <dl class="credits-list">
+          {
+            credits.map(({ role, name }) => (
+              <div class="credit-item">
+                <dt class="credit-role">{role}</dt>
+                <dd class="credit-name">{name}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </section>
+
+    <!-- External Video Link -->
+    {
+      externalVideoUrl && (
+        <section class="external-link">
+          <a
+            href={externalVideoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="watch-link"
+          >
+            Watch Full Video on YouTube →
+          </a>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style>
+  .project {
+    padding-top: 0;
+  }
+
+  /* Hero Video */
+  .hero-video {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+  }
+
+  .video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Project Info */
+  .project-info {
+    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-2xl);
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .project-title {
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    margin-bottom: var(--space-md);
+  }
+
+  .project-description {
+    font-size: var(--text-lg);
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+  }
+
+  .project-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .meta-item dt {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+  }
+
+  .meta-item dd {
+    font-size: var(--text-base);
+    color: var(--color-text);
+  }
+
+  /* Project Content */
+  .project-content {
+    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .content-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* Gallery */
+  .gallery {
+    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--space-lg);
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .gallery-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* Credits */
+  .credits {
+    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .credits-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .credits-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-xl);
+  }
+
+  .credits-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .credit-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .credit-role {
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+  }
+
+  .credit-name {
+    font-size: var(--text-base);
+    color: var(--color-text);
+  }
+
+  /* External Link */
+  .external-link {
+    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
+    text-align: center;
+  }
+
+  .watch-link {
+    display: inline-block;
+    font-size: var(--text-lg);
+    padding: var(--space-md) var(--space-xl);
+    border: 1px solid var(--color-text);
+    transition: all var(--transition-fast) var(--ease-smooth);
+  }
+
+  .watch-link:hover {
+    background-color: var(--color-text);
+    color: var(--color-bg);
+    opacity: 1;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .hero-video {
+      height: 60vh;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+    }
+
+    .gallery-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .credits-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
