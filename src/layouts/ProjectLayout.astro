@@ -1,6 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import { videoUrl, videoPoster, imageUrl } from '@lib/cloudinary';
+import { imageUrl, videoPoster, videoUrl } from '@lib/cloudinary';
 import { formatDate } from '@lib/utils';
 
 interface Props {
@@ -8,11 +8,14 @@ interface Props {
   client: string;
   date: Date;
   description: string;
-  heroVideo: string;
+  heroVideo?: string;
+  heroImage?: string;
   gallery?: string[];
   credits: { role: string; name: string }[];
   externalVideoUrl?: string;
   category: string;
+  services: string[];
+  thumbnail?: string;
 }
 
 const {
@@ -21,296 +24,354 @@ const {
   date,
   description,
   heroVideo,
+  heroImage,
   gallery,
   credits,
   externalVideoUrl,
   category,
+  services,
+  thumbnail,
 } = Astro.props;
 
 const formattedDate = formatDate(date);
+const posterUrl = thumbnail
+  ? imageUrl(thumbnail, { width: 1920, quality: 'auto' })
+  : heroVideo
+    ? videoPoster(heroVideo, { width: 1920 })
+    : heroImage
+      ? imageUrl(heroImage, { width: 1920, quality: 'auto' })
+      : '';
 ---
 
-<BaseLayout title={title} description={description}>
-  <article class="project">
-    <!-- Hero Video -->
-    <section class="hero-video">
-      <video
-        class="video"
-        src={videoUrl(heroVideo, { quality: 'auto', format: 'auto' })}
-        poster={videoPoster(heroVideo, { width: 1920 })}
-        autoplay
-        muted
-        loop
-        playsinline
-      ></video>
-    </section>
+<BaseLayout title={title} description={description} bodyClass="page-project">
+  <article class="project-page">
+    <section class="project-hero">
+      {
+        heroVideo ? (
+          <video
+            class="project-hero-video"
+            src={videoUrl(heroVideo, { quality: 'auto', format: 'auto', width: 1920 })}
+            poster={posterUrl}
+            autoplay
+            muted
+            loop
+            playsinline
+          />
+        ) : (
+          <img class="project-hero-video" src={posterUrl} alt="" />
+        )
+      }
+      <div class="project-hero-overlay"></div>
 
-    <!-- Project Info -->
-    <section class="project-info">
-      <div class="info-grid">
-        <div class="info-left">
-          <h1 class="project-title">{title}</h1>
-          <p class="project-description">{description}</p>
-        </div>
-        <div class="info-right">
-          <dl class="project-meta">
-            <div class="meta-item">
-              <dt>Client</dt>
-              <dd>{client}</dd>
+      <div class="project-hero-shell">
+        <div class="container project-hero-layout">
+          <div class="project-hero-copy panel">
+            <p class="project-kicker">
+              {client} / {category.replace('-', ' ')} / {formattedDate}
+            </p>
+            <h1 class="project-title">{title}</h1>
+            <p class="project-description">{description}</p>
+
+            <div class="project-hero-actions">
+              {externalVideoUrl && (
+                <a
+                  href={externalVideoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="pill-button"
+                >
+                  Watch full video
+                </a>
+              )}
+              <a href="/work" class="ghost-button">Back to archive</a>
             </div>
-            <div class="meta-item">
-              <dt>Date</dt>
-              <dd>{formattedDate}</dd>
-            </div>
-            <div class="meta-item">
-              <dt>Category</dt>
-              <dd>{category}</dd>
-            </div>
-          </dl>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Extended Content (from MDX) -->
-    {
-      Astro.slots.has('default') && (
-        <section class="project-content">
-          <div class="content-wrapper">
-            <slot />
-          </div>
-        </section>
-      )
-    }
+    <section class="project-body section-shell">
+      <div class="container project-body-grid">
+        <div class="project-story">
+          <p class="eyebrow">Project story</p>
+          {Astro.slots.has('default') && (
+            <div class="project-rich">
+              <slot />
+            </div>
+          )}
+        </div>
 
-    <!-- Gallery -->
-    {
-      gallery && gallery.length > 0 && (
-        <section class="gallery">
-          <div class="gallery-grid">
-            {gallery.map((imageId) => (
+        <aside class="project-sidebar panel">
+          <div class="project-meta-group">
+            <p class="project-meta-label">Client</p>
+            <p class="project-meta-value">{client}</p>
+          </div>
+
+          <div class="project-meta-group">
+            <p class="project-meta-label">Category</p>
+            <p class="project-meta-value">{category.replace('-', ' ')}</p>
+          </div>
+
+          <div class="project-meta-group">
+            <p class="project-meta-label">Release</p>
+            <p class="project-meta-value">{formattedDate}</p>
+          </div>
+
+          <div class="project-meta-group">
+            <p class="project-meta-label">Services</p>
+            <ul class="project-service-list">
+              {services.map((service) => <li>{service}</li>)}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    {gallery && gallery.length > 0 && (
+      <section class="gallery-section section-shell">
+        <div class="container gallery-grid">
+          {gallery.map((imageId) => (
+            <figure class="gallery-card panel">
               <img
-                src={imageUrl(imageId, { width: 1200, quality: 'auto' })}
+                src={imageUrl(imageId, { width: 1600, quality: 'auto' })}
                 alt=""
                 loading="lazy"
                 class="gallery-image"
               />
-            ))}
-          </div>
-        </section>
-      )
-    }
+            </figure>
+          ))}
+        </div>
+      </section>
+    )}
 
-    <!-- Credits -->
-    <section class="credits">
-      <div class="credits-wrapper">
-        <h2 class="credits-title">Credits</h2>
-        <dl class="credits-list">
-          {
-            credits.map(({ role, name }) => (
-              <div class="credit-item">
-                <dt class="credit-role">{role}</dt>
-                <dd class="credit-name">{name}</dd>
-              </div>
-            ))
-          }
-        </dl>
+    <section class="credits-section section-shell">
+      <div class="container credits-layout">
+        <div>
+          <p class="eyebrow">Credits</p>
+          <h2 class="credits-title">The crew behind the frame.</h2>
+        </div>
+
+        <div class="credits-grid">
+          {credits.map(({ role, name }) => (
+            <div class="credit-card panel">
+              <p class="credit-role">{role}</p>
+              <p class="credit-name">{name}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
-
-    <!-- External Video Link -->
-    {
-      externalVideoUrl && (
-        <section class="external-link">
-          <a
-            href={externalVideoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="watch-link"
-          >
-            Watch Full Video on YouTube →
-          </a>
-        </section>
-      )
-    }
   </article>
 </BaseLayout>
 
 <style>
-  .project {
-    padding-top: 0;
+  .project-page {
+    padding-top: clamp(5.8rem, 8vw, 7rem);
   }
 
-  /* Hero Video */
-  .hero-video {
+  .project-hero {
     position: relative;
-    width: 100%;
-    height: 80vh;
-    overflow: hidden;
+    min-height: min(100vh, 56rem);
+    overflow: clip;
   }
 
-  .video {
+  .project-hero-video,
+  .project-hero-overlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  .project-hero-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: saturate(0.94) contrast(1.02);
   }
 
-  /* Project Info */
-  .project-info {
-    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  .project-hero-overlay {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.86)),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.16) 45%, rgba(255, 255, 255, 0.66));
   }
 
-  .info-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: var(--space-2xl);
-    max-width: var(--max-width);
-    margin: 0 auto;
+  .project-hero-shell {
+    position: relative;
+    z-index: 1;
+    min-height: min(100vh, 56rem);
+    display: flex;
+    align-items: flex-end;
+    padding: clamp(2rem, 5vw, 3rem) 0;
   }
 
-  .project-title {
-    font-family: var(--font-display);
-    font-size: var(--text-title);
-    margin-bottom: var(--space-md);
+  .project-hero-layout {
+    width: min(100%, var(--max-width));
   }
 
-  .project-description {
-    font-size: var(--text-lg);
-    line-height: 1.8;
+  .project-hero-copy {
+    max-width: min(40rem, 100%);
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .project-kicker,
+  .project-meta-label,
+  .credit-role {
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: var(--color-text-secondary);
   }
 
-  .project-meta {
+  .project-title {
+    margin-top: 0.85rem;
+    font-size: clamp(3.2rem, 7vw, 6.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+  }
+
+  .project-description {
+    margin-top: 1rem;
+    max-width: 30rem;
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+  }
+
+  .project-hero-actions {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.4rem;
   }
 
-  .meta-item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
+  .project-body-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: start;
   }
 
-  .meta-item dt {
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-muted);
+  .project-story {
+    max-width: 48rem;
   }
 
-  .meta-item dd {
-    font-size: var(--text-base);
+  .project-rich {
+    margin-top: 1.3rem;
+  }
+
+  :global(.project-rich p),
+  :global(.project-rich ul),
+  :global(.project-rich ol) {
+    margin-bottom: 1.15rem;
+    font-size: clamp(1rem, 1.5vw, 1.14rem);
+    color: var(--color-text-soft);
+  }
+
+  :global(.project-rich em) {
+    font-family: var(--font-display);
+    font-size: 1.08em;
+  }
+
+  :global(.project-rich h2),
+  :global(.project-rich h3) {
+    margin: 2.2rem 0 0.8rem;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 0.95;
+  }
+
+  .project-sidebar {
+    position: sticky;
+    top: 7rem;
+    display: grid;
+    gap: 1.15rem;
+    padding: 1.25rem;
+  }
+
+  .project-meta-value {
+    margin-top: 0.3rem;
     color: var(--color-text);
   }
 
-  /* Project Content */
-  .project-content {
-    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  .project-service-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.65rem;
   }
 
-  .content-wrapper {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  /* Gallery */
-  .gallery {
-    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
+  .project-service-list li {
+    padding: 0.58rem 0.82rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
   }
 
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: var(--space-lg);
-    max-width: var(--max-width);
-    margin: 0 auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .gallery-card {
+    overflow: hidden;
   }
 
   .gallery-image {
     width: 100%;
-    height: auto;
+    height: 100%;
+    min-height: 20rem;
     object-fit: cover;
   }
 
-  /* Credits */
-  .credits {
-    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .credits-wrapper {
-    max-width: 800px;
-    margin: 0 auto;
+  .credits-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: start;
   }
 
   .credits-title {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    margin-bottom: var(--space-xl);
+    margin-top: 0.8rem;
+    font-size: clamp(2.4rem, 4.5vw, 4.2rem);
+    line-height: 0.92;
+    letter-spacing: -0.04em;
   }
 
-  .credits-list {
+  .credits-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--space-lg);
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.9rem;
   }
 
-  .credit-item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-  }
-
-  .credit-role {
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-muted);
+  .credit-card {
+    padding: 1rem;
   }
 
   .credit-name {
-    font-size: var(--text-base);
+    margin-top: 0.45rem;
+    font-size: clamp(1.25rem, 2.4vw, 1.8rem);
     color: var(--color-text);
   }
 
-  /* External Link */
-  .external-link {
-    padding: var(--space-3xl) var(--padding, var(--padding-desktop));
-    text-align: center;
-  }
-
-  .watch-link {
-    display: inline-block;
-    font-size: var(--text-lg);
-    padding: var(--space-md) var(--space-xl);
-    border: 1px solid var(--color-text);
-    transition: all var(--transition-fast) var(--ease-smooth);
-  }
-
-  .watch-link:hover {
-    background-color: var(--color-text);
-    color: var(--color-bg);
-    opacity: 1;
-  }
-
-  /* Mobile Responsive */
-  @media (max-width: 768px) {
-    .hero-video {
-      height: 60vh;
+  @media (max-width: 1024px) {
+    .project-body-grid,
+    .credits-layout {
+      grid-template-columns: 1fr;
     }
 
-    .info-grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-xl);
+    .project-sidebar {
+      position: static;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .project-page {
+      padding-top: 7rem;
     }
 
     .gallery-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .credits-list {
       grid-template-columns: 1fr;
     }
   }

@@ -3,47 +3,56 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { imageUrl } from '@lib/cloudinary';
 
-// Get all projects sorted by date
-const allProjects = await getCollection('projects');
-const sortedProjects = allProjects.sort(
+const sortedProjects = (await getCollection('projects')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
 ---
 
-<BaseLayout title="Work" description="View all projects by Simply Living Studios">
+<BaseLayout title="Work" description="Selected work by Simply Living Studios." bodyClass="page-work">
   <div class="work-page">
-    <section class="page-header">
-      <div class="container">
-        <h1 class="page-title">Work</h1>
-        <p class="page-description">
-          A selection of our recent projects across music videos, brand content, and commercial
-          work.
+    <section class="work-hero section-shell">
+      <div class="container work-hero-grid">
+        <div class="work-hero-copy">
+          <p class="eyebrow">Work archive</p>
+          <h1 class="work-title">A smoother archive for the projects behind the studio.</h1>
+        </div>
+        <p class="work-intro">
+          Every case study opens with motion first, then drops into the context: client, category,
+          creative story, credits, and supporting stills.
         </p>
       </div>
     </section>
 
-    <section class="projects-section">
-      <div class="container">
-        <div class="projects-grid">
-          {
-            sortedProjects.map((project) => (
-              <a href={`/work/${project.slug}`} class="project-card">
-                <div class="card-image">
-                  <img
-                    src={imageUrl(project.data.thumbnail, { width: 800, quality: 'auto' })}
-                    alt={project.data.title}
-                    loading="lazy"
-                  />
-                </div>
-                <div class="card-info">
-                  <h2 class="card-title">{project.data.title}</h2>
-                  <p class="card-client">{project.data.client}</p>
-                  <p class="card-category">{project.data.category}</p>
-                </div>
-              </a>
-            ))
-          }
-        </div>
+    <section class="work-list section-shell">
+      <div class="container work-stack">
+        {
+          sortedProjects.map((project, index) => (
+            <a
+              href={`/work/${project.slug}`}
+              class:list={['work-card panel', { 'work-card--lead': index === 0 }]}
+            >
+              <div class="work-card-media">
+                <img
+                  src={imageUrl(project.data.thumbnail, { width: 1600, quality: 'auto' })}
+                  alt={project.data.title}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                />
+              </div>
+
+              <div class="work-card-content">
+                <p class="work-card-kicker">
+                  {project.data.client} / {project.data.category.replace('-', ' ')} /{' '}
+                  {project.data.date.getFullYear()}
+                </p>
+                <h2 class="work-card-title">{project.data.title}</h2>
+                <p class="work-card-description">{project.data.description}</p>
+                <ul class="work-card-services">
+                  {project.data.services.slice(0, 4).map((service) => <li>{service}</li>)}
+                </ul>
+              </div>
+            </a>
+          ))
+        }
       </div>
     </section>
   </div>
@@ -51,101 +60,119 @@ const sortedProjects = allProjects.sort(
 
 <style>
   .work-page {
-    padding-top: 120px;
+    padding-top: clamp(7rem, 10vw, 8.5rem);
   }
 
-  .page-header {
-    padding: var(--space-3xl) 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .page-title {
-    font-family: var(--font-display);
-    font-size: var(--text-title);
-    margin-bottom: var(--space-lg);
-  }
-
-  .page-description {
-    font-size: var(--text-lg);
-    max-width: 700px;
-    color: var(--color-text-secondary);
-    line-height: 1.8;
-  }
-
-  .projects-section {
-    padding: var(--space-3xl) 0;
-  }
-
-  .projects-grid {
+  .work-hero-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: var(--space-2xl);
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: end;
   }
 
-  .project-card {
-    text-decoration: none;
-    color: var(--color-text);
-    display: block;
-    transition: transform var(--transition-fast) var(--ease-smooth);
+  .work-title {
+    font-size: clamp(3.4rem, 8vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    max-width: 10ch;
   }
 
-  .project-card:hover {
+  .work-intro {
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+  }
+
+  .work-stack {
+    display: grid;
+    gap: 1.4rem;
+  }
+
+  .work-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .work-card:hover,
+  .work-card:focus-visible {
+    opacity: 1;
     transform: translateY(-4px);
   }
 
-  .card-image {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background-color: #111;
-    margin-bottom: var(--space-md);
+  .work-card--lead {
+    grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 0.7fr);
   }
 
-  .card-image img {
+  .work-card-media {
+    min-height: clamp(22rem, 48vw, 44rem);
+    overflow: hidden;
+  }
+
+  .work-card-media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-speed) var(--ease-smooth);
+    transition: transform 1s var(--ease-emphasis);
   }
 
-  .project-card:hover .card-image img {
-    transform: scale(1.05);
+  .work-card:hover .work-card-media img,
+  .work-card:focus-visible .work-card-media img {
+    transform: scale(1.04);
   }
 
-  .card-info {
+  .work-card-content {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: clamp(1.2rem, 2.4vw, 2rem);
+    background: var(--color-panel-strong);
   }
 
-  .card-title {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-  }
-
-  .card-client {
-    font-size: var(--text-sm);
+  .work-card-kicker {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
   }
 
-  .card-category {
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+  .work-card-title {
+    font-size: clamp(2.6rem, 5vw, 4.8rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
   }
 
-  /* Mobile Responsive */
-  @media (max-width: 768px) {
-    .work-page {
-      padding-top: 80px;
+  .work-card-description {
+    max-width: 28rem;
+  }
+
+  .work-card-services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .work-card-services li {
+    padding: 0.55rem 0.82rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 960px) {
+    .work-hero-grid,
+    .work-card,
+    .work-card--lead {
+      grid-template-columns: 1fr;
     }
 
-    .projects-grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-xl);
+    .work-card-media {
+      min-height: 18rem;
     }
   }
 </style>

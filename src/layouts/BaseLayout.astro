@@ -9,9 +9,19 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  bodyClass?: string;
+  headerVariant?: 'solid' | 'overlay';
+  hideFooter?: boolean;
 }
 
-const { title, description, image } = Astro.props;
+const {
+  title,
+  description,
+  image,
+  bodyClass = '',
+  headerVariant = 'solid',
+  hideFooter = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -25,26 +35,26 @@ const { title, description, image } = Astro.props;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
-  <body>
+  <body class={bodyClass}>
     <!-- Grain texture overlay -->
     <div class="grain" aria-hidden="true"></div>
 
-    <Header />
+    <Header variant={headerVariant} />
 
-    <main>
+    <main class="site-main">
       <slot />
     </main>
 
-    <Footer />
+    {!hideFooter && <Footer />}
   </body>
 </html>
 
 <style is:global>
-  main {
+  .site-main {
     min-height: 100vh;
   }
 </style>

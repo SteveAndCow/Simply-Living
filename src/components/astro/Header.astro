@@ -1,132 +1,275 @@
 ---
+interface Props {
+  variant?: 'solid' | 'overlay';
+}
+
 const currentPath = Astro.url.pathname;
+const isHome = currentPath === '/';
+const { variant = 'solid' } = Astro.props;
 ---
 
-<header class="header">
-  <div class="header-content">
-    <a href="/" class="logo">
-      <span class="logo-text">Simply Living Studios</span>
+<header class:list={['site-header', `site-header--${variant}`, { 'site-header--home': isHome }]}>
+  <div class="header-shell">
+    <a href="/" class="brand" aria-label="Simply Living Studios home">
+      <span class="brand-mark">
+        <img src="/brand/simply-living-mark.jpeg" alt="" width="44" height="44" loading="eager" />
+      </span>
+      <span class="brand-lockup">
+        <span class="brand-name">Simply Living Studios</span>
+        <span class="brand-tag">Creative direction and cinematic production</span>
+      </span>
     </a>
 
-    <nav class="nav">
-      <ul class="nav-list">
-        <li>
-          <a href="/" class:list={['nav-link', { active: currentPath === '/' }]}>
-            Home
-          </a>
-        </li>
-        <li>
-          <a href="/work" class:list={['nav-link', { active: currentPath.startsWith('/work') }]}>
-            Work
-          </a>
-        </li>
-        <li>
-          <a href="/about" class:list={['nav-link', { active: currentPath === '/about' }]}>
-            About
-          </a>
-        </li>
-        <li>
-          <a href="/contact" class:list={['nav-link', { active: currentPath === '/contact' }]}>
-            Contact
-          </a>
-        </li>
-      </ul>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="/" class:list={['nav-link', { active: currentPath === '/' }]}>Home</a>
+      <a href="/work" class:list={['nav-link', { active: currentPath.startsWith('/work') }]}>Work</a>
+      <a href="/about" class:list={['nav-link', { active: currentPath === '/about' }]}>About</a>
+      <a href="/contact" class:list={['nav-link', { active: currentPath === '/contact' }]}>
+        Contact
+      </a>
     </nav>
+
+    <button class="menu-trigger" type="button" aria-label="Open menu">
+      <span class="menu-lines" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+      <span>Menu</span>
+    </button>
   </div>
 </header>
 
 <style>
-  .header {
+  .site-header {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    inset: 0 0 auto;
     z-index: var(--z-header);
-    padding: var(--space-lg) var(--padding, var(--padding-desktop));
-    mix-blend-mode: difference;
+    padding: 1.35rem var(--padding, var(--padding-desktop));
+    pointer-events: none;
   }
 
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .site-header--overlay {
+    background: transparent;
   }
 
-  .logo {
-    font-family: var(--font-display);
-    font-size: var(--text-lg);
-    font-weight: 400;
-    letter-spacing: 0.02em;
-    color: var(--color-text);
-    text-decoration: none;
-    transition: opacity var(--transition-fast) var(--ease-smooth);
-  }
-
-  .logo:hover {
-    opacity: 0.7;
-  }
-
-  .logo-text {
-    display: inline-block;
-  }
-
-  .nav-list {
-    display: flex;
-    gap: var(--space-lg);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .nav-link {
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text);
-    text-decoration: none;
-    position: relative;
-    transition: opacity var(--transition-fast) var(--ease-smooth);
-  }
-
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background-color: var(--color-text);
-    transition: width var(--transition-fast) var(--ease-smooth);
-  }
-
-  .nav-link:hover::after,
-  .nav-link.active::after {
+  .site-header--overlay .header-shell {
     width: 100%;
+    max-width: none;
   }
 
-  .nav-link.active {
+  .site-header--solid {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.76));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .header-shell {
+    width: min(100%, var(--max-width));
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    pointer-events: auto;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.95rem;
+    min-width: 0;
+  }
+
+  .brand:hover {
     opacity: 1;
   }
 
-  /* Mobile Styles */
-  @media (max-width: 768px) {
-    .logo-text {
-      font-size: var(--text-base);
+  .brand-mark {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .brand-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .site-header--overlay .brand {
+    color: rgba(255, 251, 245, 0.9);
+  }
+
+  .site-header--overlay .brand-mark {
+    width: clamp(3.35rem, 4.7vw, 5.45rem);
+    height: clamp(3.35rem, 4.7vw, 5.45rem);
+    border-radius: 0;
+    background: rgba(244, 255, 252, 0.94);
+    box-shadow: none;
+  }
+
+  .site-header--overlay .brand-mark img {
+    padding: 18%;
+    object-fit: contain;
+  }
+
+  .site-header--overlay .brand-lockup,
+  .site-header--overlay .site-nav {
+    display: none;
+  }
+
+  .brand-lockup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    min-width: 0;
+  }
+
+  .brand-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .brand-tag {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .site-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .site-header--overlay .site-nav {
+    background: rgba(255, 255, 255, 0.52);
+  }
+
+  .menu-trigger {
+    display: none;
+    align-items: center;
+    gap: 0.7rem;
+    color: rgba(238, 246, 246, 0.92);
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .site-header--overlay .menu-trigger {
+    display: inline-flex;
+  }
+
+  .menu-lines {
+    display: grid;
+    gap: 0.25rem;
+    width: 1.55rem;
+  }
+
+  .menu-lines span {
+    display: block;
+    height: 2px;
+    background: currentColor;
+    transform-origin: center;
+    transition: transform var(--transition-fast) var(--ease-emphasis);
+  }
+
+  .menu-trigger:hover .menu-lines span:first-child,
+  .menu-trigger:focus-visible .menu-lines span:first-child {
+    transform: translateX(-0.18rem);
+  }
+
+  .menu-trigger:hover .menu-lines span:last-child,
+  .menu-trigger:focus-visible .menu-lines span:last-child {
+    transform: translateX(0.18rem);
+  }
+
+  .nav-link {
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    transition:
+      color var(--transition-fast) var(--ease-smooth),
+      background-color var(--transition-fast) var(--ease-smooth),
+      transform var(--transition-fast) var(--ease-smooth);
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible,
+  .nav-link.active {
+    opacity: 1;
+    color: var(--color-text);
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .nav-link:hover {
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 980px) {
+    .site-header {
+      padding-top: 1rem;
     }
 
-    .nav-list {
-      gap: var(--space-md);
+    .header-shell {
+      align-items: flex-start;
+      flex-direction: column;
     }
 
-    .nav-link {
-      font-size: var(--text-xs);
+    .site-nav {
+      width: 100%;
+      justify-content: space-between;
     }
   }
 
-  /* Tablet Styles */
-  @media (max-width: 1024px) {
-    .header {
-      padding: var(--space-md) var(--padding, var(--padding-tablet));
+  @media (max-width: 700px) {
+    .brand-tag {
+      display: none;
+    }
+
+    .site-nav {
+      gap: 0.2rem;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .nav-link {
+      padding: 0.66rem 0.85rem;
+      letter-spacing: 0.12em;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .brand-name {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+    }
+
+    .brand-mark {
+      width: 2.4rem;
+      height: 2.4rem;
     }
   }
 </style>

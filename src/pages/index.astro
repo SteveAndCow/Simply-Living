@@ -1,402 +1,102 @@
 ---
+import ProjectExperience from '@components/svelte/ProjectExperience.svelte';
 import BaseLayout from '@layouts/BaseLayout.astro';
+import { imageUrl, videoPoster, videoUrl } from '@lib/cloudinary';
 import { getCollection } from 'astro:content';
-import { videoUrl, videoPoster, imageUrl } from '@lib/cloudinary';
 
-// Get all projects and filter for featured ones
-const allProjects = await getCollection('projects');
-const featuredProjects = allProjects
-  .filter((project) => project.data.featured)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const allProjects = (await getCollection('projects')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
 
-const recentProjects = allProjects
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 6);
+const featuredProjects = allProjects.filter((project) => project.data.featured);
+const heroProjects = featuredProjects.length > 0 ? featuredProjects : allProjects;
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const mediaUrl = (media: { type: 'image' | 'video'; id: string }) =>
+  media.type === 'video'
+    ? videoUrl(media.id, { quality: 'auto', format: 'auto', width: 960 })
+    : imageUrl(media.id, { quality: 'auto', format: 'auto', width: 1200 });
+
+const mapMedia = (media: {
+  type: 'image' | 'video';
+  id: string;
+  alt?: string;
+  caption?: string;
+  layout?: 'small' | 'medium' | 'large' | 'wide';
+}) => ({
+  type: media.type,
+  src: mediaUrl(media),
+  alt: media.alt ?? '',
+  caption: media.caption,
+  layout: media.layout ?? 'medium',
+});
+
+const experienceProjects = heroProjects.map((project) => {
+  const displayTitle = project.data.displayTitle ?? project.data.title;
+  const info = project.data.info ?? { text: [], media: [] };
+  const previewMedia =
+    project.data.heroVideo
+      ? {
+          type: 'video' as const,
+          src: videoUrl(project.data.heroVideo, {
+            quality: 'auto',
+            format: 'auto',
+            width: 1920,
+          }),
+          poster: videoPoster(project.data.heroVideo, { width: 1920 }),
+        }
+      : {
+          type: 'image' as const,
+          src: imageUrl(project.data.heroImage ?? project.data.thumbnail, {
+            quality: 'auto',
+            format: 'auto',
+            width: 1920,
+          }),
+        };
+  const fullMedia =
+    project.data.fullVideo
+      ? {
+          type: 'video' as const,
+          src: videoUrl(project.data.fullVideo, {
+            quality: 'auto',
+            format: 'auto',
+            width: 1920,
+          }),
+          poster: videoPoster(project.data.fullVideo, { width: 1920 }),
+          duration: project.data.fullVideoDuration,
+        }
+      : previewMedia;
+
+  return {
+    slug: slugify(displayTitle),
+    displayTitle,
+    client: project.data.client,
+    category: project.data.category,
+    description: project.data.description,
+    previewMedia,
+    fullMedia,
+    btsMedia: project.data.btsMedia.map(mapMedia),
+    info: {
+      text: info.text.length > 0 ? info.text : [project.data.description],
+      media: info.media.map(mapMedia),
+    },
+    credits: project.data.credits,
+  };
+});
 ---
 
-<BaseLayout>
-  <!-- Hero Section: Featured Projects with Vertical Scroll -->
-  <section class="hero-section">
-    <!-- Background Videos (will be controlled by Svelte component later) -->
-    <div class="video-backgrounds">
-      {
-        featuredProjects.map((project, index) => (
-          <video
-            class:list={['hero-video', { active: index === 0 }]}
-            data-project={project.slug}
-            src={videoUrl(project.data.heroVideo, { quality: 'auto', format: 'auto' })}
-            poster={videoPoster(project.data.heroVideo, { width: 1920 })}
-            muted
-            loop
-            playsinline
-          />
-        ))
-      }
-      <div class="video-overlay" />
-    </div>
-
-    <!-- Project List -->
-    <div class="featured-projects">
-      <div class="projects-container">
-        <h2 class="visually-hidden">Featured Work</h2>
-        {
-          featuredProjects.map((project, index) => (
-            <a
-              href={`/work/${project.slug}`}
-              class:list={['project-item stagger-item', { active: index === 0 }]}
-              data-project={project.slug}
-            >
-              <h3 class="project-title">{project.data.title}</h3>
-              <p class="project-client">{project.data.client}</p>
-            </a>
-          ))
-        }
-      </div>
-    </div>
-
-    <!-- Scroll hint -->
-    <div class="scroll-hint">
-      <p>Scroll or hover to explore</p>
-    </div>
-  </section>
-
-  <!-- About Teaser -->
-  <section class="about-teaser">
-    <div class="container">
-      <h2 class="teaser-title">We are Simply Living Studios</h2>
-      <p class="teaser-text">
-        A Toronto-based creative agency specializing in music videos, brand content, and visual
-        storytelling. We believe in the power of authentic narratives and cinematic craft to create
-        work that resonates.
-      </p>
-      <a href="/about" class="teaser-link">More about us →</a>
-    </div>
-  </section>
-
-  <!-- Recent Work Grid -->
-  <section class="work-grid">
-    <div class="container">
-      <h2 class="section-title">Recent Work</h2>
-      <div class="grid">
-        {
-          recentProjects.map((project) => (
-            <a href={`/work/${project.slug}`} class="project-card">
-              <div class="card-image">
-                <img
-                  src={imageUrl(project.data.thumbnail, { width: 800, quality: 'auto' })}
-                  alt={project.data.title}
-                  loading="lazy"
-                />
-              </div>
-              <div class="card-info">
-                <h3 class="card-title">{project.data.title}</h3>
-                <p class="card-client">{project.data.client}</p>
-              </div>
-            </a>
-          ))
-        }
-      </div>
-      <a href="/work" class="view-all-link">View All Projects →</a>
-    </div>
-  </section>
-
-  <!-- Contact CTA -->
-  <section class="contact-cta">
-    <div class="container">
-      <h2 class="cta-title">Let's work together</h2>
-      <p class="cta-text">
-        We're always excited to collaborate on new projects. Whether you're an artist, a brand, or
-        somewhere in between—let's create something meaningful.
-      </p>
-      <a href="/contact" class="cta-button">Get in Touch</a>
-    </div>
-  </section>
+<BaseLayout
+  title="Simply Living Studios"
+  description="Creative direction, cinematic production, and editorial post for artists and brands."
+  bodyClass="page-home"
+  headerVariant="overlay"
+  hideFooter
+>
+  <ProjectExperience projects={experienceProjects} client:load />
 </BaseLayout>
-
-<style>
-  /* Hero Section */
-  .hero-section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  .video-backgrounds {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    z-index: var(--z-background);
-  }
-
-  .hero-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity var(--transition-speed) var(--ease-smooth);
-  }
-
-  .hero-video.active {
-    opacity: 1;
-  }
-
-  .video-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
-    z-index: 1;
-  }
-
-  .featured-projects {
-    position: relative;
-    height: 100vh;
-    display: flex;
-    align-items: flex-end;
-    padding: var(--padding, var(--padding-desktop));
-    padding-bottom: var(--space-3xl);
-    z-index: var(--z-content);
-  }
-
-  .projects-container {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-
-  .project-item {
-    text-decoration: none;
-    color: var(--color-text-secondary);
-    transition: all var(--transition-fast) var(--ease-smooth);
-    cursor: pointer;
-  }
-
-  .project-item.active {
-    color: var(--color-text);
-  }
-
-  .project-item:hover {
-    color: var(--color-text);
-    transform: translateX(12px);
-  }
-
-  .project-title {
-    font-family: var(--font-display);
-    font-size: var(--text-hero);
-    line-height: 1;
-    margin: 0;
-    position: relative;
-  }
-
-  .project-client {
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-top: var(--space-xs);
-  }
-
-  .scroll-hint {
-    position: absolute;
-    bottom: var(--space-xl);
-    right: var(--padding, var(--padding-desktop));
-    z-index: var(--z-content);
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-secondary);
-    animation: fadeInOut 2s ease-in-out infinite;
-  }
-
-  /* About Teaser */
-  .about-teaser {
-    padding: var(--space-3xl) 0;
-    background-color: var(--color-bg);
-    position: relative;
-    z-index: var(--z-content);
-  }
-
-  .teaser-title {
-    font-family: var(--font-display);
-    font-size: var(--text-title);
-    margin-bottom: var(--space-lg);
-  }
-
-  .teaser-text {
-    font-size: var(--text-lg);
-    line-height: 1.8;
-    max-width: 800px;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-xl);
-  }
-
-  .teaser-link {
-    display: inline-block;
-    font-size: var(--text-base);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text);
-    text-decoration: none;
-    border-bottom: 1px solid var(--color-text);
-    transition: opacity var(--transition-fast) var(--ease-smooth);
-  }
-
-  .teaser-link:hover {
-    opacity: 0.7;
-  }
-
-  /* Work Grid */
-  .work-grid {
-    padding: var(--space-3xl) 0;
-    background-color: var(--color-bg);
-    position: relative;
-    z-index: var(--z-content);
-  }
-
-  .section-title {
-    font-family: var(--font-display);
-    font-size: var(--text-title);
-    margin-bottom: var(--space-2xl);
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: var(--space-xl);
-    margin-bottom: var(--space-2xl);
-  }
-
-  .project-card {
-    text-decoration: none;
-    color: var(--color-text);
-    display: block;
-    transition: transform var(--transition-fast) var(--ease-smooth);
-  }
-
-  .project-card:hover {
-    transform: translateY(-4px);
-  }
-
-  .card-image {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background-color: #111;
-    margin-bottom: var(--space-md);
-  }
-
-  .card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform var(--transition-speed) var(--ease-smooth);
-  }
-
-  .project-card:hover .card-image img {
-    transform: scale(1.05);
-  }
-
-  .card-title {
-    font-family: var(--font-display);
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-xs);
-  }
-
-  .card-client {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .view-all-link {
-    display: inline-block;
-    font-size: var(--text-base);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text);
-    text-decoration: none;
-    border-bottom: 1px solid var(--color-text);
-    transition: opacity var(--transition-fast) var(--ease-smooth);
-  }
-
-  .view-all-link:hover {
-    opacity: 0.7;
-  }
-
-  /* Contact CTA */
-  .contact-cta {
-    padding: var(--space-3xl) 0;
-    text-align: center;
-    background-color: var(--color-bg);
-    position: relative;
-    z-index: var(--z-content);
-  }
-
-  .cta-title {
-    font-family: var(--font-display);
-    font-size: var(--text-title);
-    margin-bottom: var(--space-lg);
-  }
-
-  .cta-text {
-    font-size: var(--text-lg);
-    line-height: 1.8;
-    max-width: 700px;
-    margin: 0 auto var(--space-2xl);
-    color: var(--color-text-secondary);
-  }
-
-  .cta-button {
-    display: inline-block;
-    font-size: var(--text-lg);
-    padding: var(--space-md) var(--space-2xl);
-    border: 1px solid var(--color-text);
-    text-decoration: none;
-    color: var(--color-text);
-    transition: all var(--transition-fast) var(--ease-smooth);
-  }
-
-  .cta-button:hover {
-    background-color: var(--color-text);
-    color: var(--color-bg);
-    opacity: 1;
-  }
-
-  /* Mobile Responsive */
-  @media (max-width: 768px) {
-    .project-title {
-      font-size: clamp(2rem, 8vw, 4rem);
-    }
-
-    .grid {
-      grid-template-columns: 1fr;
-    }
-
-    .scroll-hint {
-      bottom: var(--space-lg);
-      right: var(--padding, var(--padding-mobile));
-    }
-  }
-</style>
-
-<script>
-  // Basic video playback on load (will be enhanced with Svelte in Phase 3)
-  document.addEventListener('DOMContentLoaded', () => {
-    const activeVideo = document.querySelector('.hero-video.active') as HTMLVideoElement;
-    if (activeVideo) {
-      activeVideo.play().catch(() => {
-        // Autoplay prevented, mute and try again
-        activeVideo.muted = true;
-        activeVideo.play();
-      });
-    }
-  });
-</script>

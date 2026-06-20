@@ -2,87 +2,110 @@
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="footer">
-  <div class="footer-content">
-    <div class="footer-left">
-      <p class="copyright">© {currentYear} Simply Living Studios</p>
+<footer class="site-footer">
+  <div class="footer-shell">
+    <div class="footer-copy">
+      <p class="footer-kicker">Simply Living Studios</p>
+      <p class="footer-note">
+        Music videos, brand worlds, and commercial stories shaped with a clean editorial eye.
+      </p>
     </div>
 
-    <div class="footer-right">
-      <nav class="social-links">
-        <a
-          href="https://instagram.com/simplylivingstudios"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-link"
-          aria-label="Instagram"
-        >
-          Instagram
-        </a>
-        <a
-          href="mailto:hello@simplylivingstudios.com"
-          class="social-link"
-          aria-label="Email"
-        >
-          Email
-        </a>
-      </nav>
+    <div class="footer-links">
+      <a href="/work" class="footer-link">Archive</a>
+      <a href="/about" class="footer-link">Studio</a>
+      <a href="mailto:hello@simplylivingstudios.com" class="footer-link">Email</a>
+      <a
+        href="https://instagram.com/simplylivingstudios"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="footer-link"
+      >
+        Instagram
+      </a>
     </div>
+
+    <p class="footer-meta">© {currentYear} Simply Living Studios</p>
   </div>
 </footer>
 
 <style>
-  .footer {
-    padding: var(--space-2xl) var(--padding, var(--padding-desktop));
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  .site-footer {
+    position: relative;
+    z-index: var(--z-content);
+    padding: clamp(3rem, 5vw, 5rem) var(--padding, var(--padding-desktop));
+    border-top: 1px solid rgba(12, 13, 18, 0.14);
+    background: #ffffff;
   }
 
-  .footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: var(--max-width);
+  .footer-shell {
+    width: min(100%, var(--max-width));
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.3fr auto auto;
+    gap: var(--space-xl);
+    align-items: end;
   }
 
-  .copyright {
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
+  .footer-copy {
+    max-width: 34rem;
   }
 
-  .social-links {
-    display: flex;
-    gap: var(--space-lg);
-  }
-
-  .social-link {
-    font-size: var(--text-sm);
+  .footer-kicker,
+  .footer-meta {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
     color: var(--color-text-secondary);
-    text-decoration: none;
-    transition: color var(--transition-fast) var(--ease-smooth);
   }
 
-  .social-link:hover {
+  .footer-note {
+    margin-top: 0.9rem;
+    font-size: clamp(1rem, 1.8vw, 1.25rem);
+    line-height: 1.7;
+    color: var(--color-text-soft);
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.65rem;
+  }
+
+  .footer-link {
+    padding: 0.82rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border-strong);
     color: var(--color-text);
+    font-size: 0.76rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: rgba(12, 13, 18, 0.03);
   }
 
-  /* Mobile Styles */
-  @media (max-width: 768px) {
-    .footer {
-      padding: var(--space-xl) var(--padding, var(--padding-mobile));
+  .footer-link:hover,
+  .footer-link:focus-visible {
+    opacity: 1;
+    background: rgba(12, 13, 18, 0.07);
+  }
+
+  .footer-meta {
+    text-align: right;
+  }
+
+  @media (max-width: 1024px) {
+    .footer-shell {
+      grid-template-columns: 1fr;
+      align-items: start;
     }
 
-    .footer-content {
-      flex-direction: column;
-      gap: var(--space-md);
-      text-align: center;
-    }
-
-    .social-links {
-      flex-direction: column;
-      gap: var(--space-sm);
+    .footer-links,
+    .footer-meta {
+      justify-content: flex-start;
+      text-align: left;
     }
   }
 </style>

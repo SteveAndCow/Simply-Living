@@ -172,8 +172,8 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     padding: var(--space-md);
     font-family: var(--font-body);
     font-size: var(--text-base);
-    background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: #ffffff;
+    border: 1px solid rgba(12, 13, 18, 0.24);
     color: var(--color-text);
     transition: border-color var(--transition-fast) var(--ease-smooth);
   }
@@ -200,16 +200,14 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     font-size: var(--text-base);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    background-color: transparent;
-    border: 1px solid var(--color-text);
-    color: var(--color-text);
+    background-color: #0e0f12;
+    color: #fff;
     cursor: pointer;
     transition: all var(--transition-fast) var(--ease-smooth);
   }
 
   .submit-button:hover {
-    background-color: var(--color-text);
-    color: var(--color-bg);
+    background-color: #111214;
   }
 
   .submit-button:disabled {
@@ -224,11 +222,11 @@ import BaseLayout from '@layouts/BaseLayout.astro';
   }
 
   .form-status.success {
-    color: #4ade80;
+    color: var(--color-text);
   }
 
   .form-status.error {
-    color: #ef4444;
+    color: var(--color-text);
   }
 
   /* Info Container */
@@ -281,7 +279,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 
   .info-note {
     padding: var(--space-lg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(12, 13, 18, 0.12);
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
     line-height: 1.7;
